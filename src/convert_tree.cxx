@@ -11,7 +11,6 @@
 
 namespace {
   void h5_hist_from_th1(const TH1*, H5::CommonFG& fg);
-  H5::DataType packed(H5::DataType);
 
   // type of group that represents a histogram
   enum HistType {HISTOGRAM};
@@ -52,18 +51,6 @@ namespace {
     double upper_edge;
   };
 
-  H5::CompType get_bin_type() {
-    const auto dt = H5::PredType::NATIVE_DOUBLE;
-    H5::CompType type(sizeof(bin_t));
-#define INSERT(name) type.insertMember(#name, offsetof(bin_t, name), dt)
-    INSERT(value);
-    INSERT(error);
-    INSERT(lower_edge);
-    INSERT(upper_edge);
-#undef INSERT
-    return type;
-  }
-
   H5::EnumType get_group_type() {
     H5::EnumType btype(sizeof(HistType));
 
@@ -78,16 +65,6 @@ namespace {
     attr.write(gtype, &type);
   }
 
-  void add_bins(H5::Group& group, const std::vector<bin_t>& bins) {
-    hsize_t extent[] = {bins.size()};
-    H5::DataSpace dspace(1, extent);
-    H5::CompType type = get_bin_type();
-    H5::DSetCreatPropList params;
-    params.setChunk(1, extent);
-    params.setDeflate(9);
-    auto dset = group.createDataSet("bins", packed(type), dspace, params);
-    dset.write(bins.data(), type);
-  }
   void add_dvector(H5::Group& group, const std::vector<double>& vec,
                    const std::string& name) {
     hsize_t extent[] = {vec.size()};
@@ -139,14 +116,6 @@ namespace {
     add_dvector(group, values, "values");
     // fill the edges
     add_dvector(group, edges, "edges");
-  }
-
-  H5::DataType packed(H5::DataType in) {
-    // TODO: Figure out why a normal copy constructor doesn't work here.
-    //       The normal one seems to create shallow copies.
-    auto out = H5::CompType(H5Tcopy(in.getId()));
-    out.pack();
-    return out;
   }
 
 }
