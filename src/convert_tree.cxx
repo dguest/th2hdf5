@@ -51,18 +51,20 @@ namespace {
     double upper_edge;
   };
 
-  H5::EnumType get_group_type() {
-    H5::EnumType btype(sizeof(HistType));
-
-    HistType histogram = HISTOGRAM;
-    btype.insert("HISTOGRAM", &histogram);
-
-    return btype;
+  std::string get_hist_type(HistType type) {
+    switch (type) {
+    case HISTOGRAM: return "histogram";
+    default: throw std::logic_error("unknown hist type");
+    }
   }
+
   void write_group_type(H5::Group& group, HistType type) {
-    auto gtype = get_group_type();
-    auto attr = group.createAttribute("hist_type", gtype, H5S_SCALAR);
-    attr.write(gtype, &type);
+    auto gtype = H5::StrType(H5::PredType::C_S1, H5T_VARIABLE);
+    gtype.setCset(H5T_CSET_UTF8);
+    H5std_string hist_type_string = get_hist_type(type);
+    auto space = H5::DataSpace(H5S_SCALAR);
+    auto attr = group.createAttribute("hist_type", gtype, space);
+    attr.write(gtype, hist_type_string);
   }
 
   void add_dvector(H5::Group& group, const std::vector<double>& vec,
