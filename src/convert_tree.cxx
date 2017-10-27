@@ -35,9 +35,8 @@ void convert_tree(const TDirectoryFile& td, H5::CommonFG& fg) {
        convert_tree(*dir, group);
        continue;
      }
-
-      const TH1 *hist = dynamic_cast<const TH1*>(obj);
-      if (hist) h5_hist_from_th1(hist, fg);
+     const TH1 *hist = dynamic_cast<const TH1*>(obj);
+     if (hist) h5_hist_from_th1(hist, fg);
    }
 }
 

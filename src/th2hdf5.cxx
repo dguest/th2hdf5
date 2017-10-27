@@ -14,8 +14,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   unshittify();
-  TFile root_file(argv[1], "read");
+  TFile* root_file = TFile::Open(argv[1], "read");
   H5::H5File hdf_file(argv[2], H5F_ACC_TRUNC);
-  convert_tree(root_file, hdf_file);
+  convert_tree(*root_file, hdf_file);
   return 0;
 }
