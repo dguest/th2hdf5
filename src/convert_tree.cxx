@@ -117,7 +117,7 @@ namespace {
 
     // fill bin values
     add_fvector(group, values, "values");
-    add_fvector(group, values, "errors");
+    add_fvector(group, error, "errors");
     // fill the edges
     add_fvector(group, edges, "edges");
   }
