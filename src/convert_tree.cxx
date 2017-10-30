@@ -66,11 +66,11 @@ namespace {
     attr.write(gtype, hist_type_string);
   }
 
-  void add_dvector(H5::Group& group, const std::vector<double>& vec,
+  void add_fvector(H5::Group& group, const std::vector<float>& vec,
                    const std::string& name) {
     hsize_t extent[] = {vec.size()};
     H5::DataSpace space(1, extent);
-    auto dtype = H5::PredType::NATIVE_DOUBLE;
+    auto dtype = H5::PredType::NATIVE_FLOAT;
     H5::DSetCreatPropList params;
     params.setChunk(1, extent);
     params.setDeflate(9);
@@ -101,12 +101,14 @@ namespace {
       bins.push_back(bin);
     }
 
-    std::vector<double> edges;
-    std::vector<double> values;
+    std::vector<float> edges;
+    std::vector<float> values;
+    std::vector<float> error;
     for (int bin_number = 0; bin_number < n_bins; bin_number++) {
       const auto& bin = bins.at(bin_number);
       if (bin_number != 0) edges.push_back(bin.lower_edge);
       values.push_back(bin.value);
+      error.push_back(bin.error);
     }
 
     // build group
@@ -114,9 +116,10 @@ namespace {
     write_group_type(group, HISTOGRAM);
 
     // fill bin values
-    add_dvector(group, values, "values");
+    add_fvector(group, values, "values");
+    add_fvector(group, values, "errors");
     // fill the edges
-    add_dvector(group, edges, "edges");
+    add_fvector(group, edges, "edges");
   }
 
 }
