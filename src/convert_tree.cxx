@@ -8,7 +8,7 @@
 #include <set>
 
 #include <iostream>
-
+#include <stdexcept>
 namespace {
   void h5_hist_from_th1(const TH1*, H5::CommonFG& fg);
 
