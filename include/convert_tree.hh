@@ -4,9 +4,9 @@
 class TDirectoryFile;
 
 namespace H5 {
-  class CommonFG;
+  class Group;
 }
 
-void convert_tree(const TDirectoryFile& td, H5::CommonFG& hg);
+void convert_tree(const TDirectoryFile& td, H5::Group& hg);
 
 #endif

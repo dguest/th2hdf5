@@ -10,13 +10,13 @@
 #include <iostream>
 #include <stdexcept>
 namespace {
-  void h5_hist_from_th1(const TH1*, H5::CommonFG& fg);
+  void h5_hist_from_th1(const TH1*, H5::Group& fg);
 
   // type of group that represents a histogram
   enum HistType {HISTOGRAM};
 }
 
-void convert_tree(const TDirectoryFile& td, H5::CommonFG& fg) {
+void convert_tree(const TDirectoryFile& td, H5::Group& fg) {
   // build a list of keys (this is to avoid asking for the same key
   // with differn cycle numbers)
   std::set<std::string> keys;
@@ -78,7 +78,7 @@ namespace {
     dset.write(vec.data(), dtype);
   }
 
-  void h5_hist_from_th1(const TH1* hist, H5::CommonFG& fg) {
+  void h5_hist_from_th1(const TH1* hist, H5::Group& fg) {
     // check that name isn't already taken
     std::string hist_name = hist->GetName();
     if (H5Lexists(fg.getLocId(), hist_name.c_str(), H5P_DEFAULT)) {
