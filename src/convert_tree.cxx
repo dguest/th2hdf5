@@ -72,8 +72,9 @@ namespace {
     H5::DataSpace space(1, extent);
     auto dtype = H5::PredType::NATIVE_FLOAT;
     H5::DSetCreatPropList params;
-    params.setChunk(1, extent);
-    params.setDeflate(9);
+    // params.setChunk(1, extent);
+    // params.setDeflate(9);
+    params.setLayout(H5D_COMPACT);
     auto dset = group.createDataSet(name, dtype, space, params);
     dset.write(vec.data(), dtype);
   }
