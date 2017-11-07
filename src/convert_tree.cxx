@@ -16,14 +16,20 @@ namespace {
   enum HistType {HISTOGRAM};
 }
 
-void convert_tree(const TDirectoryFile& td, H5::Group& fg) {
+void convert_tree(const TDirectoryFile& td, H5::Group& fg,
+                  std::vector<std::regex> regexes) {
   // build a list of keys (this is to avoid asking for the same key
   // with differn cycle numbers)
   std::set<std::string> keys;
    TIter next(td.GetListOfKeys());
    TKey *key;
    while ((key = dynamic_cast<TKey*>(next()))) {
-     keys.insert(key->GetName());
+     std::string name = key->GetName();
+     if (regexes.size() == 0) {
+       keys.insert(name);
+     } else if (std::regex_search(name, regexes.at(0))) {
+       keys.insert(name);
+     }
    }
    for (const auto key_name: keys) {
      key = td.GetKey(key_name.c_str());
@@ -32,7 +38,12 @@ void convert_tree(const TDirectoryFile& td, H5::Group& fg) {
      const TDirectoryFile* dir = dynamic_cast<const TDirectoryFile*>(obj);
      if (dir) {
        auto group = fg.createGroup(dir->GetName());
-       convert_tree(*dir, group);
+       std::vector<std::regex> new_regexes;
+       if (regexes.size() > 0) {
+         new_regexes.insert(new_regexes.begin(),
+                            regexes.begin() + 1, regexes.end());
+       }
+       convert_tree(*dir, group, new_regexes);
        continue;
      }
      const TH1 *hist = dynamic_cast<const TH1*>(obj);
@@ -72,8 +83,9 @@ namespace {
     H5::DataSpace space(1, extent);
     auto dtype = H5::PredType::NATIVE_FLOAT;
     H5::DSetCreatPropList params;
-    params.setChunk(1, extent);
-    params.setDeflate(9);
+    // params.setChunk(1, extent);
+    // params.setDeflate(9);
+    params.setLayout(H5D_COMPACT);
     auto dset = group.createDataSet(name, dtype, space, params);
     dset.write(vec.data(), dtype);
   }
