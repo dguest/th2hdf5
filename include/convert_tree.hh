@@ -7,6 +7,10 @@ namespace H5 {
   class CommonFG;
 }
 
-void convert_tree(const TDirectoryFile& td, H5::CommonFG& hg);
+#include <vector>
+#include <regex>
+
+void convert_tree(const TDirectoryFile& td, H5::CommonFG& hg,
+                  std::vector<std::regex> regexes = {});
 
 #endif

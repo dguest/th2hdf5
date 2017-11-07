@@ -16,14 +16,20 @@ namespace {
   enum HistType {HISTOGRAM};
 }
 
-void convert_tree(const TDirectoryFile& td, H5::CommonFG& fg) {
+void convert_tree(const TDirectoryFile& td, H5::CommonFG& fg,
+                  std::vector<std::regex> regexes) {
   // build a list of keys (this is to avoid asking for the same key
   // with differn cycle numbers)
   std::set<std::string> keys;
    TIter next(td.GetListOfKeys());
    TKey *key;
    while ((key = dynamic_cast<TKey*>(next()))) {
-     keys.insert(key->GetName());
+     std::string name = key->GetName();
+     if (regexes.size() == 0) {
+       keys.insert(name);
+     } else if (std::regex_search(name, regexes.at(0))) {
+       keys.insert(name);
+     }
    }
    for (const auto key_name: keys) {
      key = td.GetKey(key_name.c_str());
@@ -32,7 +38,12 @@ void convert_tree(const TDirectoryFile& td, H5::CommonFG& fg) {
      const TDirectoryFile* dir = dynamic_cast<const TDirectoryFile*>(obj);
      if (dir) {
        auto group = fg.createGroup(dir->GetName());
-       convert_tree(*dir, group);
+       std::vector<std::regex> new_regexes;
+       if (regexes.size() > 0) {
+         new_regexes.insert(new_regexes.begin(),
+                            regexes.begin() + 1, regexes.end());
+       }
+       convert_tree(*dir, group, new_regexes);
        continue;
      }
      const TH1 *hist = dynamic_cast<const TH1*>(obj);
