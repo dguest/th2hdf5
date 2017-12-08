@@ -10,6 +10,9 @@
 # mac shit
 .DS_Store
 
+# ATLAS shit
+.asetup.save
+
 # python shit
 __pycache__
 
