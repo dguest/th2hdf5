@@ -59,6 +59,7 @@ namespace {
     double error;
     double lower_edge;
     double upper_edge;
+    std::string name;
   };
 
   std::string get_hist_type(HistType type) {
@@ -89,6 +90,29 @@ namespace {
     auto dset = group.createDataSet(name, dtype, space, params);
     dset.write(vec.data(), dtype);
   }
+  void add_svector(H5::Group& group, std::vector<std::string> vec,
+                   const std::string& name) {
+    hsize_t extent[] = {vec.size()};
+    H5::DataSpace space(1, extent);
+    size_t string_length = 0;
+    for (const auto& str: vec) {
+      string_length = std::max(str.size(), string_length);
+    }
+    if (string_length == 0) {
+      return;
+    }
+    for (auto& str: vec) {
+      size_t char_to_add = string_length - str.size();
+      str.append('\0', char_to_add);
+    }
+    H5::StrType dtype(H5::PredType::C_S1, string_length);
+    H5::DSetCreatPropList params;
+    // params.setChunk(1, extent);
+    // params.setDeflate(9);
+    params.setLayout(H5D_COMPACT);
+    auto dset = group.createDataSet(name, dtype, space, params);
+    dset.write(vec.data(), dtype);
+  }
 
   void h5_hist_from_th1(const TH1* hist, H5::Group& fg) {
     // check that name isn't already taken
@@ -110,17 +134,20 @@ namespace {
       bin.error = hist->GetBinError(bin_number);
       bin.lower_edge = hist->GetXaxis()->GetBinLowEdge(bin_number);
       bin.upper_edge = hist->GetXaxis()->GetBinUpEdge(bin_number);
+      bin.name = hist->GetXaxis()->GetBinLabel(bin_number);
       bins.push_back(bin);
     }
 
     std::vector<float> edges;
     std::vector<float> values;
     std::vector<float> error;
+    std::vector<std::string> names;
     for (size_t bin_number = 0; bin_number < n_bins; bin_number++) {
       const auto& bin = bins.at(bin_number);
       if (bin_number != 0) edges.push_back(bin.lower_edge);
       values.push_back(bin.value);
       error.push_back(bin.error);
+      names.push_back(bin.name);
     }
 
     // build group
@@ -132,6 +159,8 @@ namespace {
     add_fvector(group, error, "errors");
     // fill the edges
     add_fvector(group, edges, "edges");
+    // fill the names
+    add_svector(group, names, "bin_names");
   }
 
 }
