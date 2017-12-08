@@ -12,6 +12,7 @@ include_directories(include src)
 
 find_package( HDF5 1.10 REQUIRED COMPONENTS CXX HL)
 find_package(ROOT REQUIRED COMPONENTS RIO Hist Tree Net Core)
+find_package(ZLIB)
 
 # CMake often finds the wrong include directories (i.e. on lxplus)
 include_directories(BEFORE SYSTEM ${HDF5_INCLUDE_DIRS})

@@ -104,7 +104,7 @@ namespace {
     // build bins vector
     const hsize_t n_bins = hist->GetNbinsX() + 2; // 2 extra for overflow
     std::vector<bin_t> bins;
-    for (int bin_number = 0; bin_number < n_bins; bin_number++) {
+    for (size_t bin_number = 0; bin_number < n_bins; bin_number++) {
       bin_t bin;
       bin.value = hist->GetBinContent(bin_number);
       bin.error = hist->GetBinError(bin_number);
@@ -116,7 +116,7 @@ namespace {
     std::vector<float> edges;
     std::vector<float> values;
     std::vector<float> error;
-    for (int bin_number = 0; bin_number < n_bins; bin_number++) {
+    for (size_t bin_number = 0; bin_number < n_bins; bin_number++) {
       const auto& bin = bins.at(bin_number);
       if (bin_number != 0) edges.push_back(bin.lower_edge);
       values.push_back(bin.value);

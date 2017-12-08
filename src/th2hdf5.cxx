@@ -21,7 +21,7 @@ void help(const char* prog) {
 }
 
 int main(int argc, char* argv[]) {
-  for (size_t argn = 0; argn < argc; argn++) {
+  for (int argn = 0; argn < argc; argn++) {
     if (strcmp("-h", argv[argn]) == 0) {
       help(argv[0]);
       return 1;
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   std::vector<std::regex> regexes;
-  for (size_t argn = 3; argn < argc; argn++) {
+  for (int argn = 3; argn < argc; argn++) {
     regexes.emplace_back(argv[argn]);
   }
   unshittify();
