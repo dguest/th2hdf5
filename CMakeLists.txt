@@ -25,3 +25,8 @@ add_executable(th2hdf5
 target_include_directories( th2hdf5
   PRIVATE ${HDF5_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
 target_link_libraries(th2hdf5 ${HDF5_LIBRARIES} ${ROOT_LIBRARIES})
+
+install(TARGETS th2hdf5
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib
+  PUBLIC_HEADER DESTINATION include)
