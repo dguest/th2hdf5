@@ -16,4 +16,16 @@ Creates one new "group" for each histogram:
  - Group attribute: `hist_type`
  - Bin values are stored in `values` dataset, including under and overflow
  - Bin edges are stored in `edges` dataset
+ - Bin errors are stored in the `errors` dataset
 
+Building
+--------
+
+You can build with `make` or with CMake:
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```

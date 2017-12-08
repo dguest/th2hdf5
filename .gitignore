@@ -2,7 +2,6 @@
 *.root
 *.h5
 *.json
-*.txt
 *.pdf
 *.png
 *.tgz
